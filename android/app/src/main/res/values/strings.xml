@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<resources>
+    <string name="app_name">Orrery</string>
+    <string name="wallpaper_description">The solar system right now, or the space age replayed: every planet, moon and spacecraft where it is.</string>
+    <string name="wallpaper_author">Orrery</string>
+    <string name="wallpaper_settings">Orrery wallpaper settings</string>
+    <string name="dream_settings">Orrery screensaver settings</string>
+</resources>

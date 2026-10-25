@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<dream xmlns:android="http://schemas.android.com/apk/res/android"
+    android:previewImage="@drawable/wallpaper_thumb"
+    android:settingsActivity="io.github.fqazzazee.orrery/io.github.fqazzazee.orrery.DreamSettings" />

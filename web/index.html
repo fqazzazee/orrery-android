@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<title>Orrery</title>
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="css/orrery.css">
+<!-- lib/render.js imports Cairo, as GJS has it; here it draws on a canvas. -->
+<script type="importmap">{"imports": {"cairo": "./js/cairo.js"}}</script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>

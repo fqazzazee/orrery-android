@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+  <!-- Orrery's icon: the Sun, three orbits seen at an angle, and their planets. -->
+  <defs>
+    <radialGradient id="sun"><stop offset="0" stop-color="#fffbe9"/><stop offset="0.6" stop-color="#ffdb84"/><stop offset="1" stop-color="#ff9b38"/></radialGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffc46b" stop-opacity="0.5"/><stop offset="1" stop-color="#ffc46b" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#000"/>
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="2.4">
+    <ellipse cx="64" cy="64" rx="25" ry="15"/>
+    <ellipse cx="64" cy="64" rx="40" ry="24"/>
+    <ellipse cx="64" cy="64" rx="55" ry="33"/>
+  </g>
+  <circle cx="64" cy="64" r="24" fill="url(#glow)"/>
+  <circle cx="64" cy="64" r="11" fill="url(#sun)"/>
+  <circle cx="84" cy="73" r="5" fill="#4a86d8"/>
+  <circle cx="30" cy="51" r="4.4" fill="#d0683c"/>
+  <circle cx="101" cy="45" r="7.5" fill="#d9b48a"/>
+</svg>

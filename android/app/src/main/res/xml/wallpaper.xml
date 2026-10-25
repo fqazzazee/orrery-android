@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:author="@string/wallpaper_author"
+    android:description="@string/wallpaper_description"
+    android:settingsActivity="io.github.fqazzazee.orrery.WallpaperSettings"
+    android:showMetadataInPreview="true"
+    android:thumbnail="@drawable/wallpaper_thumb" />

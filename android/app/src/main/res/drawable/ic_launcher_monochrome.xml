@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<!-- docs/icon.svg, without its rounded square: the launcher gives the shape. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+    <group android:scaleX="0.6" android:scaleY="0.6" android:pivotX="64" android:pivotY="64">
+        <path android:pathData="M39,64 a25,15 0 1,0 50,0 a25,15 0 1,0 -50,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="3" />
+        <path android:pathData="M24,64 a40,24 0 1,0 80,0 a40,24 0 1,0 -80,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="3" />
+        <path android:pathData="M9,64 a55,33 0 1,0 110,0 a55,33 0 1,0 -110,0 Z" android:strokeColor="#FFFFFFFF" android:strokeWidth="3" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M53,64 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M78.5,73 a5.5,5.5 0 1,0 11.0,0 a5.5,5.5 0 1,0 -11.0,0 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M25,51 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M93.5,45 a7.5,7.5 0 1,0 15.0,0 a7.5,7.5 0 1,0 -15.0,0 Z" />
+    </group>
+</vector>

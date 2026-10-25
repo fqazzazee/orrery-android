@@ -1,0 +1,12 @@
+# Every version the app builds with, pinned.
+[versions]
+agp = "9.4.1"
+webkit = "1.14.0"
+
+[libraries]
+# WebViewAssetLoader: the page is served from the APK's assets over https, so
+# its ES modules load as they do from a web server.
+webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }

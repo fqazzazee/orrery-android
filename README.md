@@ -1,262 +1,109 @@
-# Orrery
+# Orrery for Android
 
-A live solar system as your wallpaper. Every planet sits where it really is, and the spacecraft of the space age fly the paths they really flew. It's all drawn on pure black for OLED screens.
+A live solar system for your phone or tablet: an app, a live wallpaper for the home and lock screens, and a screensaver. Every planet sits where it really is, and the spacecraft of the space age fly the paths they really flew. It's all drawn on pure black for OLED screens.
 
-**[The project page](https://fqazzazee.github.io/orrery/)** shows it moving: up close, from afar, and everything between.
-
-[![GNOME Shell 48–51](https://img.shields.io/badge/GNOME%20Shell-48%20%C2%B7%2049%20%C2%B7%2050%20%C2%B7%2051-4A86CF?logo=gnome&logoColor=white)](#install)
-[![GJS](https://img.shields.io/badge/GJS-ES%20modules-F7DF1E?logo=javascript&logoColor=black)](https://gjs.guide)
+[![Android 8+](https://img.shields.io/badge/Android-8%2B-3DDC84?logo=android&logoColor=white)](#install)
+[![Latest release](https://img.shields.io/github/v/release/fqazzazee/orrery-android?include_prereleases&color=FFC46B)](https://github.com/fqazzazee/orrery-android/releases)
 [![NASA JPL data](https://img.shields.io/badge/orbits-NASA%20JPL-0B3D91)](https://ssd.jpl.nasa.gov)
-[![OLED black](https://img.shields.io/badge/background-%23000000-000000)](#power-and-oled-care)
-
-[![Fedora](https://img.shields.io/badge/Fedora-rpm-51A2DA?logo=fedora&logoColor=white)](#install)
-[![Debian and Ubuntu](https://img.shields.io/badge/Debian%20%7C%20Ubuntu-deb-A81D33?logo=debian&logoColor=white)](#install)
-[![Arch](https://img.shields.io/badge/Arch-pkg-1793D1?logo=archlinux&logoColor=white)](#install)
-[![KDE, XFCE, Sway, Hyprland](https://img.shields.io/badge/also-KDE%20%C2%B7%20XFCE%20%C2%B7%20Sway%20%C2%B7%20Hyprland-555555)](#other-desktops)
-[![Latest release](https://img.shields.io/github/v/release/fqazzazee/orrery?color=FFC46B)](https://github.com/fqazzazee/orrery/releases/latest)
-
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/license-GPL--2.0--or--later-61AFEF)](LICENSE)
-[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/fqazzazee)
 
-<img alt="Orrery replaying 2025 at sixty days a second: the planets turning around the Sun, the spacecraft's trails in color, and a card popping up for each event" src="docs/media/hero.webp">
+This is the Android fork of [Orrery for GNOME](https://github.com/fqazzazee/orrery). The astronomy, the mission paths, the fact cards and the drawing code are the same modules (`lib/`); what is new is a touch interface sized for phones and tablets, and the Android app around it.
 
-## What it does
+<img alt="Orrery replaying the space age: the planets turning around the Sun, the spacecraft's trails in color, and a card popping up for each event" src="docs/media/hero.webp">
 
-An orrery is the old clockwork model of the solar system. This one runs on real astronomy. The planets follow NASA JPL's orbits and turn the way they really face, so Earth's day side matches the time on screen. Over a hundred spacecraft and telescopes, from Mariner 2 in 1962 and the Apollo flights to Dragonfly on its way to Titan, follow paths fitted to JPL's record of where they went. The ones still flying follow their published plans.
+## Four ways to run it
 
-Leave it running and it shows the solar system right now. Or play with it:
+- **The app.** Full screen, with the timeline, the cards and the settings.
+- **Live wallpaper.** The solar system behind your home screen. It turns a little as you swipe between home screen pages, and a tap on an empty spot shows a card for the planet there. It replays the space age by default, without the date and the cards.
+- **Lock screen.** The same live wallpaper, set for the lock screen as well. While the phone is locked it keeps to the middle of the screen, clear of the clock and the notifications, and shows the solar system right now.
+- **Screensaver.** While charging or docked: the missions' stories one after another, each from launch to the end, with the dates and the cards. It dims after ten minutes.
 
-- **Click anything** for a card of live facts. It shows how far away it is, how long its light and radio take to reach us, what the trip would take, and trivia about each world.
-- **Double-click a planet** to fly in to its moons, satellites and landers.
-- **Scroll out** past the Voyagers to the heliopause, the Oort cloud and the nearest stars.
-- **Drag the timeline** through sixty years of launches and flybys, and on to the missions still to come.
+Each one has its own settings for the clock, the speed, the cards, the brightness and the frame rate (**Settings ▸ Live wallpaper / Lock screen / Screensaver**). Everything else, like what is shown, the spin and the camera, is shared.
 
-<table>
-  <tr>
-    <td width="50%"><img alt="A pinned card for Jupiter, expanded to its full sheet of facts" src="docs/screenshots/card-jupiter.webp"></td>
-    <td width="50%"><img alt="Voyager 2 a few days before its Neptune flyby in August 1989, its card listing every encounter" src="docs/screenshots/voyager2.webp"></td>
-  </tr>
-  <tr>
-    <td><b>A card for everything.</b> Planets, moons, comets, Lagrange points and spacecraft each have a sheet of live numbers and stories.</td>
-    <td><b>Every encounter, one click away.</b> Here is Voyager 2 four days before Neptune, the only visit any spacecraft has made there.</td>
-  </tr>
-</table>
+In the app, **Settings ▸ Use Orrery as** has a button for each. Android lets an app ask to be the wallpaper, but you pick where it goes: choose **Home and lock screen** to have it on both. The screensaver is picked in the system's **Display ▸ Screen saver** settings.
 
-### Up close
+## Touch
 
-Double-click a planet, scroll the wheel over it, or press the zoom button on its card. The planet fills the screen, with its moons where they really are and the satellites and spacecraft circling it.
+- **Tap** anything for a card of live facts: how far away it is, how long its light and radio take to reach us, what the trip would take, and trivia about each world. Tap again to let it go.
+- **Double-tap a planet** to fly in to its moons, satellites and landers. Back, or a double-tap on empty space, flies out again.
+- **Pinch** out to zoom past the Voyagers to the heliopause, the Oort cloud and the nearest stars, or in to a planet.
+- **Drag** to turn the solar system around the Sun, or tilt it.
+- **Press and hold** to trace something's path without opening its card.
+- **The timeline** shows up when you touch the screen. Drag it through sixty years of launches and flybys, and on to the missions still to come. The list button opens the panel: tours, what to show, the missions, and the settings.
 
-<img alt="Flying in from the whole solar system to Saturn and its moons" src="docs/media/flyin.webp">
+## Phones and tablets
 
-<table>
-  <tr>
-    <td width="33%"><img alt="Earth up close with the ISS, Hubble, GPS and Starlink satellites, the geostationary belt and the Moon" src="docs/screenshots/earth-iss.webp"></td>
-    <td width="33%"><img alt="Mars up close with Phobos, Deimos and its orbiters" src="docs/screenshots/mars.webp"></td>
-    <td width="33%"><img alt="Jupiter up close with its four big moons and Juno" src="docs/screenshots/jupiter.webp"></td>
-  </tr>
-  <tr>
-    <td><b>Earth</b>: the ISS, Hubble, GPS, Starlink, the geostationary belt, the Moon, and the telescopes at L1 and L2</td>
-    <td><b>Mars</b>: Phobos and Deimos, ten orbiters past and present, and the rovers' landing sites</td>
-    <td><b>Jupiter</b>: Io, Europa, Ganymede and Callisto where they really are, and Juno looping over the poles</td>
-  </tr>
-</table>
+The layout follows the screen:
 
-### From afar
+- **Phone, upright:** the date on top, the planets in the middle, one card at a time at the bottom, and the timeline in two rows. Distances are squeezed logarithmically so the inner planets are not a huddle around the Sun.
+- **Phone, sideways:** the planets keep left of the cards, and an event card stands in for the fact card.
+- **Tablet:** cards stack on the right as on the desktop, and the timeline runs along the bottom.
 
-Scroll down on the desktop to pull back. You pass Neptune and the Kuiper belt, the termination shock and the heliopause, and rings for a light-day, a light-month and a light-year. Then come the Oort cloud's trillions of comets, and Alpha Centauri. The Voyagers, the Pioneers and New Horizons fly out along dashed paths marked with the years they get there, out to 40,000 AD.
-
-<img alt="Pulling back from the planets past the heliopause and the Oort cloud to the nearest stars" src="docs/media/zoomout.webp">
-
-### Everywhere on the desktop
-
-The Activities overview and workspace switches show the solar system, still moving. The timeline's buttons pause and play, change the speed, stop the spin, play music, show and hide things, and open the settings.
-
-<table>
-  <tr>
-    <td width="50%"><img alt="The show-and-hide panel open on the desktop, with chips for orbits, names, moons and every mission" src="docs/screenshots/panel.webp"></td>
-    <td width="50%"><img alt="The sunlight view, coloring the plane of the planets by how much sunlight falls there" src="docs/screenshots/sunlight.webp"></td>
-  </tr>
-  <tr>
-    <td><b>Show and hide</b> orbits, names, moons, trails and every mission, one at a time or all at once.</td>
-    <td><b>Sunlight view</b>, from white-hot near the Sun to Neptune's 1.5 W/m². It can follow your charger.</td>
-  </tr>
-</table>
-
-<img alt="Opening the Activities overview: the solar system keeps moving in the workspace cards and behind the app grid" src="docs/media/overview.webp">
-
-### Everything, in detail
-
-- **Real positions.** Planets sit where they really were (or are) on the date shown, from NASA JPL's orbital elements (good from 1800 to 2050).
-- **3D look.** You see the system from an angle. Each planet is a lit sphere with a sharp day/night line, turning on its real axis: Uranus rolls on its side, and Saturn's rings tilt the way they really do.
-- **Relative speeds.** Planets orbit at their true relative speeds. They also spin at their true speeds relative to each other, on a slower clock so Jupiter's 10-hour day does not blur.
-- **The space age, replayed, and what is coming.**
-  - **Flown:** 21 spacecraft fly the gravity assists they really flew, on the real dates: Mariner 10, Pioneer 10 and 11, both Voyagers, Giotto, Galileo, Ulysses, Cassini, Rosetta, MESSENGER, New Horizons, Dawn, Juno, Hayabusa2, OSIRIS-REx/APEX, Parker Solar Probe, BepiColombo, Solar Orbiter, DART and Lucy.
-  - **Orbiters, landers and comet chasers:** 35 more, from Mariner 2, the Veneras and the Vikings to Magellan, NEAR, Stardust, Deep Impact, the Mars rovers, MRO, MAVEN, Hope, Tianwen-1 and Perseverance, on paths fitted to JPL Horizons.
-  - **To the Moon:** 29 missions, from Luna 9 and Apollo 8 to Chang'e 6, Blue Ghost and Artemis II. They fly in Earth's close-up: free returns around the far side, lunar orbits, landings and liftoffs, CAPSTONE's halo orbit and the long looping routes of GRAIL, Danuri and SLIM.
-  - **Planned:** missions on their way fly their planned routes into the 2030s: Psyche, Juice, Europa Clipper, Hera, Tianwen-2, ESCAPADE, MMX and Dragonfly.
-  - **At L1 and L2:** telescopes and Sun-watchers sit there: SOHO, WMAP, Herschel, Planck, Gaia, JWST, Euclid, Aditya-L1, IMAP, Roman and PLATO.
-  - A card pops up at each launch, flyby and arrival.
-- **Stories and tours.**
-  - Press **▶ Story** on a mission's card to follow only that spacecraft from launch to the end. It cruises between encounters, flies in to each planet it passes to watch the swing-by up close, and heads out past the planets with the Voyagers. A bar at the top steps back and forward or exits.
-  - The panel's **Tours** fly past every planet in turn, or play every mission's story one after another.
-  - **Automatic tour** (in the preferences) starts planet flybys, every story, or one mission's story after the desktop has sat untouched for a few minutes, and stops as soon as you're back.
-- **Moons, asteroids, comets and Lagrange points.**
-  - The 22 biggest moons circle their planets on a squeezed scale (our Moon where it really is, at its real phase).
-  - Ceres and Vesta have their own orbits.
-  - Halley's Comet and the interstellar comet 3I/ATLAS grow tails near the Sun.
-  - The asteroids and comets missions visit (Gaspra, Ida, Eros, Itokawa, Tempel 1, Bennu, Ryugu, Didymos, the Lucy Trojans, Arrokoth and more) appear while the craft are there.
-  - Markers show the Sun–Earth Lagrange points, and a swarm of dots shows Jupiter's Trojans.
-- **Fact cards.** Live numbers for the date on screen: distance from the Sun and from Earth, light and radio delay, orbital speed right now, and how long the trip would take by car, airliner or spacecraft. They rotate with trivia about each world.
-- **Live mode.** Shows the solar system right now. Voyager 1 is about 172 AU out and nearing one light-day from Earth.
-- **Up close.**
-  - Double-click a planet, scroll the wheel over it, or press the zoom button on its card to fly in. The planet fills the middle, turned the way it really faces, with its moons where they really are (from JPL Horizons).
-  - **Earth:** the ISS, Hubble, Tiangong, the GPS and Starlink constellations and the geostationary belt, with the Moon, L1 and L2 farther out.
-  - **Moon missions** fly out to the Moon and back, with landers sitting where they touched down.
-  - **Flybys:** craft passing a planet swing by on the curve that really bent their course; Voyager 1 skims Jupiter at about 5 of its radii.
-  - **Elsewhere:** Mars's orbiters and rovers, Venus's orbiters and Venera landers, Juno at Jupiter, Cassini at Saturn and BepiColombo at Mercury.
-  - **Scale:** true near the planet, logarithmic farther out.
-  - **Time:** runs at the planet's own pace, a thousand or so times real speed, with the clock in UTC. Pause it and the date holds while the moons and satellites keep circling (as long as the spin is on).
-- **From afar.**
-  - Scroll the wheel down on the desktop, or use the zoom-out button, to pull back past the planets. You pass the termination shock and the heliopause, rings for one light-day, -week, -month and -year, the Kuiper belt, Sedna and Eris, the inner and outer Oort cloud, and the nearest stars.
-  - The Voyagers, the Pioneers and New Horizons fly out along dashed paths marked with the years they get there, out to 40,000 AD.
-  - The scale eases to logarithmic as the camera pulls back and rises. Time speeds up gently as you pull back, from the planets' own pace to about 30 times that at the nearest stars. The timeline reaches to 2500.
-- **Interactive.**
-  - Point at anything to trace it; click to pin a card that follows it with live numbers. Expand the card for the full, scrolling sheet.
-  - **A planet's sheet:** where it is in Earth's sky, its next opposition, its season and how long the trip takes. Then its orbit, gravity, air, magnetism, insides and moons, how it was found and named, who visited, and every bit of trivia.
-  - **Moons, comets, asteroids and Lagrange points** have their own sheets; L1 and L2 list the telescopes there.
-  - **A spacecraft's card** lists its encounters (clicking one jumps there), its mass and power, what it is known for and where it went.
-  - Links in a card open the moon, planet or spacecraft they name.
-  - Right-click still opens the usual desktop menu.
-- **Timeline.**
-  - A scrubber with a tick for every launch, flyby and arrival, out to the planned ones in the 2030s. Drag or scroll it to move through time, and click a tick to jump to that event.
-  - **Controls:** play/pause, slower/faster and **Now**. Click the playhead (or middle-click anywhere on the bar) to pause or play. At the end come zoom, the planets' spin, the ☀ sunlight view, the speaker (it steps the music through its modes) and the list button that opens the panel.
-  - **Placement:** top or bottom, centered or in a corner; whatever shares its corner moves aside.
-  - It appears when the pointer is on the desktop and fades away after a few seconds.
-- **Show and hide from the desktop.**
-  - The list button on the timeline opens a panel. It starts with the tours and the modes: **Music** and **Animation** (each Muted or Paused, Background only, or Continuous). Then come chips for orbits, names, stars, belts, moons, comets, Lagrange points, trails and fact cards, and for every spacecraft, Moon mission and telescope.
-  - Each group has **All** and **None**, and a switch hides or shows all missions at once.
-  - **Settings…** in the panel opens the preferences.
-- **Music.** A slow ambient piece made up as it plays (drifting chords, a low drone, soft bells in long echoes), or your own music from a folder, shuffled. The speaker on the timeline steps through **Muted**, **Background only** (it fades out while windows cover the desktop) and **Continuous**. It always stops when the screen locks.
-- **In the overview too.** The Activities overview shows the solar system in its workspace cards and, dimmed, behind the app grid; workspaces slide by with it when you switch.
-- **Sunlight view.**
-  - The ☀ button colors the plane of the planets by how much sunlight falls there, from white-hot near the Sun through Earth's 1,361 W/m² to Neptune's 1.5. It adds labeled contours and the habitable zone.
-  - Planets show their sunlight in W/m², and spacecraft as a multiple of Earth's: Parker Solar Probe takes 473 times Earth's sunlight at its closest.
-  - It can switch itself on while the charger is connected, or while on battery.
-
-## Status
-
-Stable: [v1.4.0](https://github.com/fqazzazee/orrery/releases/tag/v1.4.0) is the latest release.
-
-- **GNOME:** tested in a real GNOME Shell on 48, 49, 50 and 51, each in a container, both from source and from the installed RPM and DEB packages.
-- **Other desktops:** the `orrery-wallpaper` companion's live background is tested in Sway, and its pictures render on Fedora, Debian and Arch.
-- **Mission dates:** dates after today are the published plans, and may change.
-
-### Planned
-
-**Orrery on macOS and Windows, as a web wallpaper.** The orbits, missions and fact cards are plain JavaScript, so they can run in a browser. A small layer will let the same drawing code paint on a web canvas as well as in GNOME. The plan, in order:
-
-1. A web build of what `orrery-wallpaper` shows: the solar system moving, without the clicking.
-2. Packages for wallpaper apps that show web pages: [Lively Wallpaper](https://www.rocksdanister.com/lively/) on Windows and [Plash](https://sindresorhus.com/plash) on macOS. The same build will run live on the [project page](https://fqazzazee.github.io/orrery/).
-3. The cards, the timeline and flying in and out, rebuilt in HTML.
-
-The GNOME extension stays the main version, and both will share the same astronomy and mission code.
-
-## Install
-
-From the [latest release](https://github.com/fqazzazee/orrery/releases/latest). Orrery runs on **GNOME 48, 49, 50 and 51**.
-
-```bash
-v=1.4.0   # the release's version
-url=https://github.com/fqazzazee/orrery/releases/download/v$v
-# Fedora, RHEL, openSUSE (zypper install works the same)
-sudo dnf install $url/gnome-shell-extension-orrery-$v-1.noarch.rpm
-# Debian 13+, Ubuntu 25.04+, Pop!_OS, Mint
-curl -LO $url/gnome-shell-extension-orrery_${v}-1_all.deb
-sudo apt install ./gnome-shell-extension-orrery_${v}-1_all.deb
-# Arch, Manjaro, EndeavourOS
-curl -LO $url/gnome-shell-extension-orrery-$v-1-any.pkg.tar.zst
-sudo pacman -U gnome-shell-extension-orrery-$v-1-any.pkg.tar.zst
-# Any distribution, just for you
-curl -LO $url/orrery@fqazzazee.github.io.shell-extension.zip
-gnome-extensions install orrery@fqazzazee.github.io.shell-extension.zip
-```
-
-Log out and back in, then turn on **Orrery** in Extensions (or `gnome-extensions enable orrery@fqazzazee.github.io`). Settings are in the extension's preferences, or behind the gear on the timeline.
-
-Each release lists its files' SHA-256 sums in `SHA256SUMS`. With it beside your downloads, `sha256sum -c --ignore-missing SHA256SUMS` checks them.
-
-From a checkout, `make link` symlinks it into `~/.local/share/gnome-shell/extensions`.
-
-The scene covers the main monitor. The others get a solar system of their own (starting at the same date, and explored separately), a copy of the main one, or the plain wallpaper, under Content › Interaction › Other monitors. The overview and workspace switches show live copies of them. If you would rather see your wallpaper there, turn that off under Content › Interaction.
-
-Clicks reach the scene wherever no window covers the desktop. A desktop-icons extension draws a window over the whole desktop, which takes those clicks instead.
-
-### Other desktops
-
-GNOME Shell extensions only run in GNOME Shell. For **KDE Plasma, XFCE, Cinnamon, MATE, Budgie, LXQt, Sway, Hyprland** and the rest, there is `orrery-wallpaper`, in the same three package formats. It draws the same solar system, without the clicking.
-
-<img alt="The picture orrery-wallpaper draws: the solar system on 24 October 2026, with the mission list and a fact card" src="docs/screenshots/other-desktops.webp">
-
-- **A wallpaper that keeps up:** `systemctl --user enable --now orrery-wallpaper` keeps the wallpaper showing the solar system as it is right now, redrawn every 10 minutes.
-  - It is set with your desktop's own tool: `plasma-apply-wallpaperimage`, `xfconf-query`, `gsettings`, `swaymsg`, `hyprpaper`, `swaybg` or `feh`.
-  - Some desktops do not start systemd's graphical session (XFCE, MATE, LXQt). There, copy `/usr/share/orrery-wallpaper/autostart/orrery-wallpaper.desktop` to `~/.config/autostart/` instead.
-- **An animated background:** `systemctl --user enable --now orrery-wallpaper-live` runs one on Wayland compositors with layer-shell (Sway, Hyprland, niri, labwc, river, Wayfire, COSMIC). It needs `gtk4-layer-shell`.
-- **One picture:** `orrery-wallpaper render picture.png [--date 1989-08-25] [--size 3840x2160]` draws it. `orrery-wallpaper --help` lists the rest.
+The status bar, the navigation bar and the camera cutout are kept clear. **Full screen** (on by default) hides the bars; swipe from an edge to bring them back.
 
 ## Power and OLED care
 
-- **Stops when hidden:** with **Background only** animation (the default), it stops whenever maximized or fullscreen windows or the overview hide the desktop. **Continuous** keeps it going behind windows, and **Paused** keeps a still picture that only moves while the pointer is on the desktop. The panel on the timeline switches between the three. Nothing runs behind the lock screen.
-- **See-through apps:** pick apps, like a transparent terminal, and choose what carries on behind their windows: the animation, the music, or both.
-- **Several monitors:** it only stops once every monitor showing the solar system is hidden.
-- **Little redrawing:**
-  - Planets move by translation, not relayout.
-  - Each layer only redraws when it changes by most of a pixel.
-  - The bands on Jupiter and Saturn are drawn once and reused.
-- **True black:** night sides, glows and cards all fade to `#000000`.
-- **Pixel shift** slowly drifts the whole scene by a few pixels to spread wear.
-- **Pause once windows cover** a set share of the desktop, not only when one is maximized.
-- **Battery saver:** on battery or in Power Saver mode, the frame rate drops and the planets stop spinning.
-- **Slow down when still:** with time paused and nothing spinning, it runs at 5 frames per second until the pointer moves.
-- **Dim after** a few idle minutes: the scene fades to a lower brightness and 10 frames per second. It comes back the moment you move the mouse.
-- **Quiet timeline:** it only lights up while you use it.
-- **Save more** by lowering **Frames per second** and **Brightness**.
+- **Stops when hidden:** the app, the wallpaper and the screensaver draw nothing while they are off screen.
+- **Frame rates:** 30 a second in the app, 24 on the home screen, 20 on the lock screen, and 5 while nothing moves.
+- **Battery saver:** in Android's battery saver, the frame rate drops further.
+- **Sunlight view** can turn on by itself while charging, or off it.
+- **True black** and pixel shift, as on the desktop, and an optional dim after a few idle minutes.
+
+## Install
+
+Download `orrery_X.Y.Z_android.apk` from the [releases](https://github.com/fqazzazee/orrery-android/releases) and open it on the phone (allow installs from your browser or file manager when Android asks). Android 8 or later; the page needs an up-to-date Android System WebView (Chrome 89 or later), which Play keeps current.
+
+The APK is about 300 KB and asks for no permissions: the whole app is in it, and links open in your browser.
+
+## Build
+
+```sh
+make apk-debug                    # android/app/build/outputs/apk/debug/app-debug.apk, and lint
+make apk APK_VERSION=1.0.0        # dist/orrery_1.0.0_android.apk, signed with the release key
+make apk-cert                     # the release certificate's SHA-256
+make serve                        # the web app at http://127.0.0.1:8765/web/
+```
+
+`make apk` signs with the key named by `ORRERY_SIGNING_KEYSTORE` (a PKCS12 file), `ORRERY_SIGNING_PASSWORD` and `ORRERY_SIGNING_ALIAS`, taken from the environment or from `~/.android/orrery-release.env`. The key is never in the repository. Each release must be signed with the same key, or it will not install over the one before. To release, build with `make apk`, then attach the APK to a GitHub release tagged `vX.Y.Z`.
+
+It needs the Android SDK in `~/Android/Sdk` (or `ANDROID_HOME`) and a JDK (Android Studio's, in `/opt/android-studio/jbr`, if there is one).
+
+In a browser, `?surface=wallpaper`, `lock` or `dream` shows the other ways it runs.
+
+## How it is put together
+
+| Where | What |
+| --- | --- |
+| `lib/` | The astronomy, the bodies, the missions and their paths, the facts, the tours, and the Cairo drawing code: shared with the GNOME extension, unchanged. |
+| `web/js/cairo.js` | The part of Cairo's API that `lib/render.js` uses, drawn on a web canvas, so the same drawing code paints in a browser. |
+| `web/js/scene.js` | The solar system, the cards, the labels and the timeline, laid out for touch and for any screen size. |
+| `web/js/main.js` | The frame clock, the gestures, the power saving, and the messages from Android. |
+| `web/js/store.js` | The settings, with each surface's own values over the shared ones. |
+| `android/` | The app: a WebView that serves `web/` and `lib/` from the APK's assets, the live wallpaper (the page on a virtual display that draws into the wallpaper's surface), the screensaver, and the bridge that keeps one set of settings for all three. |
+
+## What is not here yet
+
+- **Your own music.** The ambient music is here; playing a folder of your own tracks is not.
+- **Desktop-only features** (see-through apps, several monitors, the desktop's right-click menu) have no Android counterpart.
 
 ## How the paths are built
 
 **Lambert legs.** Each leg between two encounters is the orbit that joins the two bodies' real positions on those dates (Lambert's problem). The path is exact at every encounter.
 
-**Waypoints.** Some craft fired their engines between encounters: the ion-driven Dawn, Psyche and BepiColombo, or long loops like Ulysses's. For them, waypoints from NASA JPL's Horizons trajectories keep the path to the one the craft really flew. `tools/fit-waypoints.py` compares every mission with Horizons. It adds waypoints until the model stays within 4% of the distance from the Sun.
+**Waypoints.** Some craft fired their engines between encounters: the ion-driven Dawn, Psyche and BepiColombo, or long loops like Ulysses's. For them, waypoints from NASA JPL's Horizons trajectories keep the path to the one the craft really flew.
 
-**Resonant loops.** Some legs leave a planet and return to it after a whole number of its years, like Parker's Venus loops and Galileo's two-year loop. Any orbit with a matching period would fit these, so they use the craft's known number of laps and its perihelion instead.
+**Resonant loops.** Some legs leave a planet and return to it after a whole number of its years, like Parker's Venus loops and Galileo's two-year loop. These use the craft's known number of laps and its perihelion.
 
 **Leaving the planets.** The Pioneers and Voyagers head out in their real directions at their real speeds.
 
-**Squeezed distances.** Distances are compressed (square root by default) so that Mercury and Neptune fit on one screen.
-
-## Development
-
-```sh
-make test                    # unit tests for the orbital math, every mission path and every card (gjs only)
-make test-shell RELEASE=45   # run it in a real GNOME Shell 51 in a container (44: GNOME 50, 43: 49;
-                             #   DISTRO=debian RELEASE=trixie: 48), and report any JavaScript error
-make dist                    # build the zip and the rpm, deb and Arch packages into dist/ (podman or docker)
-tools/fit-waypoints.py [id]  # refit mission waypoints against JPL Horizons (needs network)
-```
-
-To release, push a tag like `v1.4.0` that matches `version-name` in `metadata.json`. GitHub Actions then builds every package and publishes them as a release.
-
-The project page lives in [`docs/`](docs). Its screenshots and clips were recorded from the extension itself, running in a headless GNOME Shell.
-
 ## Contributing
 
-Bug reports and ideas are welcome in [issues](https://github.com/fqazzazee/orrery/issues). If you want to add a mission, open an issue first, with its JPL Horizons ID if it has one.
+Bug reports and ideas are welcome in [issues](https://github.com/fqazzazee/orrery-android/issues). Say which phone or tablet and which Android version, and whether it is the app, the wallpaper, the lock screen or the screensaver.
 
-## Support
-
-If it made you look up from your work and wonder where Voyager is now, you can [buy me a coffee ☕](https://buymeacoffee.com/fqazzazee).
+A change to the astronomy, the missions or the cards belongs in [Orrery for GNOME](https://github.com/fqazzazee/orrery), where `lib/` comes from.
 
 ## License
 
-Orrery is free software under the GPL-2.0-or-later ([`LICENSE`](LICENSE)), as GNOME Shell's own license asks of its extensions.
+Orrery is free software under the GPL-2.0-or-later ([`LICENSE`](LICENSE)). The Outfit font in `web/fonts/` is under the SIL Open Font License ([`web/fonts/OFL.txt`](web/fonts/OFL.txt)).
 
 The planets' orbits come from NASA JPL's approximate orbital elements. The asteroid and comet orbits come from JPL's Small-Body Database. The spacecraft paths are checked against JPL Horizons.
