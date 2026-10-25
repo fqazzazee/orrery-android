@@ -37,8 +37,8 @@ class OrreryWallpaper : WallpaperService() {
         private var holder: SurfaceHolder? = null
         private var width = 0
         private var height = 0
-        // The virtual display's refresh rate: 60 unless the page asks for more (or less).
-        private var rate = 60f
+        // The refresh rate asked for, past 60; 0 leaves it to the system.
+        private var rate = 0f
 
         // Unlocked, the wallpaper is the home screen's again; switched off, it will wake on
         // the lock screen.
@@ -80,7 +80,7 @@ class OrreryWallpaper : WallpaperService() {
             try {
                 val dm = getSystemService(DisplayManager::class.java)
                 val dpi = resources.displayMetrics.densityDpi
-                val vd = if (Build.VERSION.SDK_INT >= 34)
+                val vd = if (Build.VERSION.SDK_INT >= 34 && rate > 0f)
                     dm.createVirtualDisplay(
                         VirtualDisplayConfig.Builder("orrery-wallpaper", width, height, dpi)
                             .setSurface(holder.surface)
@@ -110,7 +110,7 @@ class OrreryWallpaper : WallpaperService() {
             }
         }
 
-        // A hint to the compositor (Android 11 and later).
+        // A hint to the compositor (Android 11 and later); 0 takes it back.
         private fun setSurfaceRate() {
             if (Build.VERSION.SDK_INT < 30) return
             try {

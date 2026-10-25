@@ -8,10 +8,12 @@ import android.view.Display
 import android.view.Window
 import kotlin.math.roundToInt
 
-// The screen's refresh rate for a frame rate: the slowest the screen offers that keeps up with
-// it, so 30 frames a second do not keep a 120 Hz screen at 120, and 90 or 120 get a screen
-// that fast where there is one.
+// A faster screen for 90 or 120 frames a second: the slowest refresh rate the screen offers
+// that keeps up. At 60 and below Orrery asks for nothing and the system chooses, as before:
+// asking for less slowed everything on screens with 24, 30 or 48 Hz modes, not just Orrery.
 object Refresh {
+    const val DEFAULT = 60f
+
     fun display(context: Context): Display? =
         context.getSystemService(DisplayManager::class.java)?.getDisplay(Display.DEFAULT_DISPLAY)
 
@@ -28,18 +30,20 @@ object Refresh {
         modes(display).map { it.refreshRate }.distinctBy { it.roundToInt() }.sorted()
 
     private fun modeFor(display: Display, fps: Float): Display.Mode? {
+        if (fps <= DEFAULT) return null
         val modes = modes(display).sortedBy { it.refreshRate }
         return modes.firstOrNull { it.refreshRate >= fps - 1 } ?: modes.lastOrNull()
     }
 
-    fun rateFor(display: Display, fps: Float): Float = modeFor(display, fps)?.refreshRate ?: 60f
+    // 0: no preference.
+    fun rateFor(display: Display, fps: Float): Float = modeFor(display, fps)?.refreshRate ?: 0f
 
     // For a window of the app's own: the activity's, the screensaver's.
     fun apply(window: Window, display: Display?, fps: Float): String {
-        val mode = display?.let { modeFor(it, fps) } ?: return "no"
+        val id = display?.let { modeFor(it, fps) }?.modeId ?: 0
         val attrs = window.attributes
-        if (attrs.preferredDisplayModeId != mode.modeId) {
-            attrs.preferredDisplayModeId = mode.modeId
+        if (attrs.preferredDisplayModeId != id) {
+            attrs.preferredDisplayModeId = id
             window.attributes = attrs
         }
         return "yes"

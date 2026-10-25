@@ -101,13 +101,16 @@ function frame(now) {
         return;
     frameId = requestAnimationFrame(frame);
     // A frame when the rate allows: requestAnimationFrame comes at the
-    // screen's rate, 60, 90 or 120 a second. The time over the interval is
-    // carried, so 90 on a 120 screen draws three frames in four, not all.
+    // screen's rate, 60, 90 or 120 a second, a little early or late. A
+    // quarter of the interval's slack keeps a frame that is barely early;
+    // the time over the interval is carried (up to that slack), so 90 on a
+    // 120 screen draws three frames in four, not all.
     const interval = 1000 / fps();
+    const slack = Math.min(4, interval / 4);
     const since = now - lastFrame;
-    if (since < interval - 1.5)
+    if (since < interval - slack)
         return;
-    lastFrame = since > 2 * interval ? now : now - Math.max(0, since - interval);
+    lastFrame = since > 2 * interval ? now : now - Math.max(0, Math.min(since - interval, slack));
     const dt = Math.min(0.25, (now - last) / 1000);
     last = now;
     try {
@@ -249,9 +252,8 @@ store.connect(key => {
         syncRefresh();
 });
 
-// The screen's refresh rate to ask Android for: the slowest that keeps up
-// with the frame rate, so 60 does not run a 120 Hz screen flat out, and 90
-// or 120 get a screen that fast.
+// The frame rate, for Android: past 60 it asks for a screen that fast; at
+// 60 and below it leaves the screen to the system.
 let askedRate = 0;
 function syncRefresh() {
     const rate = saving() ? Math.min(store.get('fps'), store.get('battery-fps')) : store.get('fps');

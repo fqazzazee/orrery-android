@@ -2131,6 +2131,11 @@ export class Scene {
     // The date, the legend and the missions: from the left edge, or from
     // the right one while the cards take the left.
     _hudPlace(el, dx, y) {
+        // Called on every tick of the date: nothing is written unless it moved.
+        const key = `${this._hudRight}|${Math.round(this._W - this._area.right)}|${Math.round(this._area.left)}|${this._margin + dx}|${Math.round(y)}`;
+        if (el._placed === key)
+            return;
+        el._placed = key;
         if (this._hudRight) {
             el.style.left = 'auto';
             el.style.right = `${Math.round(this._W - this._area.right + this._margin + dx)}px`;

@@ -46,7 +46,7 @@ The status bar, the navigation bar and the camera cutout are kept clear. **Full 
 ## Power and OLED care
 
 - **Stops when hidden:** the app, the wallpaper and the screensaver draw nothing while they are off screen.
-- **Frame rates:** 30 a second in the app, 24 on the home screen, 20 on the lock screen, and 5 while nothing moves. Choose up to 90 or 120 for a smoother picture on a screen that fast: Orrery asks Android for the slowest refresh rate that keeps up, so a 120 Hz screen runs at 60 for 30 frames a second, and at 120 only when asked. The live wallpaper gets more than 60 on Android 14 and later.
+- **Frame rates:** 30 a second in the app, 24 on the home screen, 20 on the lock screen, and 5 while nothing moves. Choose 90 or 120 for a smoother picture on a screen that fast: Orrery then asks Android for a refresh rate that keeps up. At 60 and below it leaves the screen's refresh rate to the system. The live wallpaper gets more than 60 on Android 14 and later.
 - **Battery saver:** in Android's battery saver, the frame rate drops further.
 - **Sunlight view** can turn on by itself while charging (or on battery), and off again after: **Settings ▸ Spacecraft and sunlight ▸ Sunlight view by itself**. The wallpaper, the lock screen and the screensaver each have their own.
 - **True black** and pixel shift, as on the desktop, and an optional dim after a few idle minutes.
