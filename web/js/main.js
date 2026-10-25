@@ -396,7 +396,7 @@ window.addEventListener('keydown', e => {
 // The back button: the settings, then whatever the scene has open.
 function back() {
     if (settingsPage?.isOpen) {
-        settingsPage.close();
+        settingsPage.back();
         return true;
     }
     return scene.back();
@@ -454,7 +454,8 @@ function handleHost(type, data) {
             scene.setOffset(data);
         return true;
     case 'tap':
-        if (store.get('tap-cards') !== false) {
+        // Only the home screen has the setting: none on the lock screen.
+        if (store.get('tap-cards')) {
             wake();
             scene.peek(data.x, data.y);
         }

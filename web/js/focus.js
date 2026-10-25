@@ -11,7 +11,7 @@ import * as Astro from '../../lib/astro.js';
 import {BODY, GM, moonsOf} from '../../lib/bodies.js';
 import * as Render from '../../lib/render.js';
 import {LANDERS, MISSION_ORBITS, SATELLITES, orbitOf} from '../../lib/satellites.js';
-import {Picture} from './sprite.js';
+import {Picture, stamp} from './sprite.js';
 import * as Text from './text.js';
 
 const LOG_K = 0.25;
@@ -448,16 +448,19 @@ export class PlanetView {
                     if (f !== front || (item.kind === 'lander' && !f))
                         return;
                     const s = item.size;
+                    if (item.kind !== 'moon' && item.kind !== 'swarm' && item.kind !== 'lander' && item.kind !== 'lpoint') {
+                        stamp(`craft ${item.rgb}`, s, this._ctx.dpr, c => Render.drawCraft(c, s, item.rgb))
+                            .drawAt(ctx, Math.round(x - s / 2), Math.round(y - s / 2));
+                        return;
+                    }
                     cr.save();
                     cr.translate(Math.round(x - s / 2), Math.round(y - s / 2));
                     if (item.kind === 'moon')
                         Render.drawMoon(cr, s, item.rgb, this._light ?? [1, 0, 0]);
                     else if (item.kind === 'swarm' || item.kind === 'lander')
                         Render.drawSpeck(cr, s, item.rgb);
-                    else if (item.kind === 'lpoint')
-                        Render.drawMarker(cr, s, item.rgb, 0.6);
                     else
-                        Render.drawCraft(cr, s, item.rgb);
+                        Render.drawMarker(cr, s, item.rgb, 0.6);
                     cr.restore();
                     cr.newPath();
                 });

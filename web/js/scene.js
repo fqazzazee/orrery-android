@@ -17,7 +17,7 @@ import {planSpan, planetTour, storyPlan} from '../../lib/tour.js';
 import Cairo from './cairo.js';
 import {FarLayer} from './far.js';
 import {PlanetView} from './focus.js';
-import {Picture} from './sprite.js';
+import {Picture, stamp} from './sprite.js';
 import * as Text from './text.js';
 import {Card, LayersPanel, StoryBar, Timeline, h} from './ui.js';
 
@@ -2172,6 +2172,8 @@ export class Scene {
         }
 
         // A pinned card stays until closed and follows its subject.
+        if (this._pin && !this._pinsAllowed)
+            this._deselect();
         if (this._pin) {
             this._pin.target = this._target(this._selected);
             return;
@@ -2306,8 +2308,17 @@ export class Scene {
         }
     }
 
+    // The wallpaper, the lock screen and the screensaver show no card of
+    // any kind (a tour's, a tap's) with fact cards off; in the app a tap
+    // still brings one up.
+    get _pinsAllowed() {
+        return this._controls || this._settings.get('show-facts');
+    }
+
     // Pin a card for a subject; toggle: a second tap on it lets go.
     _select(subject, {expand = false, toggle = false} = {}) {
+        if (!this._pinsAllowed)
+            return;
         if (toggle && sameSubject(subject, this._selected)) {
             this._deselect();
             return;
@@ -2532,11 +2543,8 @@ export class Scene {
         for (const tr of this._trajectories) {
             if (!tr.now || !tr.onScreen)
                 continue;
-            cr.save();
-            cr.translate(Math.round(tr.now[0] - size / 2), Math.round(tr.now[1] - size / 2));
-            Render.drawCraft(cr, size, tr.rgb);
-            cr.restore();
-            cr.newPath();
+            stamp(`craft ${tr.rgb}`, size, this._dpr, c => Render.drawCraft(c, size, tr.rgb))
+                .drawAt(ctx, Math.round(tr.now[0] - size / 2), Math.round(tr.now[1] - size / 2));
         }
         for (const p of this._pulses) {
             const now = p.tr.now;

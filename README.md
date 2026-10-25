@@ -18,9 +18,9 @@ This is the Android fork of [Orrery for GNOME](https://github.com/fqazzazee/orre
 - **Lock screen.** The same live wallpaper, set for the lock screen as well. While the phone is locked it keeps to the middle of the screen, clear of the clock and the notifications, and shows the solar system right now.
 - **Screensaver.** While charging or docked: the missions' stories one after another, each from launch to the end, with the dates and the cards. It dims after ten minutes.
 
-Each one has its own settings for the clock, the speed, the cards and where they go, the brightness and the frame rate (**Settings ▸ Live wallpaper / Lock screen / Screensaver**). The frame rate is the app's unless you pick another. The fact cards, the names, the spacecraft and the date can be turned off for each one, and turning one off for the app turns it off everywhere. Everything else, like the spin and the camera, is shared.
+Each one has its own settings for the clock, the speed, the cards and where they go, the brightness and the frame rate (**Settings ▸ Live wallpaper / Lock screen / Screensaver**). The frame rate is the app's unless you pick another. The fact cards, the names, the spacecraft and the date can be turned off for each one, and turning one off for the app turns it off everywhere. With fact cards off, the wallpaper, the lock screen and the screensaver show no card at all, not even a tour's; the lock screen never shows one for a tap. Everything else, like the spin and the camera, is shared.
 
-In the app, **Settings ▸ Use Orrery as** has a button for each. Android lets an app ask to be the wallpaper, but you pick where it goes: choose **Home and lock screen** to have it on both. The screensaver is picked in the system's **Display ▸ Screen saver** settings.
+In the app, **Settings ▸ Use Orrery as** has a page for each, with a button to set it up. Android lets an app ask to be the wallpaper, but you pick where it goes: choose **Home and lock screen** to have it on both. The screensaver is picked in the system's **Display ▸ Screen saver** settings.
 
 ## Touch
 
@@ -39,7 +39,7 @@ The layout follows the screen:
 - **Phone, sideways:** the planets keep left of the cards, and an event card stands in for the fact card.
 - **Tablet:** cards stack on the right as on the desktop, and the timeline runs along the bottom.
 
-**Settings ▸ Text ▸ Card position** moves the cards to the top, the middle or the bottom of the screen, and **Card side** puts them on the left of a wide screen (the date and the missions then move to the right). The wallpaper, the lock screen and the screensaver each have their own.
+**Settings ▸ Cards and text ▸ Card position** moves the cards to the top, the middle or the bottom of the screen, and **Card side** puts them on the left of a wide screen (the date and the missions then move to the right). The wallpaper, the lock screen and the screensaver each have their own.
 
 The status bar, the navigation bar and the camera cutout are kept clear. **Full screen** (on by default) hides the bars; swipe from an edge to bring them back.
 
@@ -48,7 +48,7 @@ The status bar, the navigation bar and the camera cutout are kept clear. **Full 
 - **Stops when hidden:** the app, the wallpaper and the screensaver draw nothing while they are off screen.
 - **Frame rates:** 30 a second, and 5 while nothing moves. The wallpaper, the lock screen and the screensaver run at the app's rate unless they are given their own. Choose 90 or 120 for a smoother picture on a screen that fast: Orrery then asks Android for a refresh rate that keeps up. At 60 and below it leaves the screen's refresh rate to the system. The live wallpaper gets more than 60 on Android 14 and later.
 - **Battery saver:** in Android's battery saver, the frame rate drops further.
-- **Sunlight view** can turn on by itself while charging (or on battery), and off again after: **Settings ▸ Spacecraft and sunlight ▸ Sunlight view by itself**. The wallpaper, the lock screen and the screensaver each have their own.
+- **Sunlight view** can turn on by itself while charging (or on battery), and off again after: **Settings ▸ What is shown ▸ Sunlight view by itself**. The wallpaper, the lock screen and the screensaver each have their own.
 - **True black** and pixel shift, as on the desktop, and an optional dim after a few idle minutes.
 
 ## Install

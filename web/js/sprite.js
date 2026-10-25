@@ -58,3 +58,19 @@ export class Picture {
         this.drawAt(ctx, x - this.w * scale / 2, y - this.h * scale / 2, scale);
     }
 }
+
+// A small picture drawn many times, like a spacecraft's glow: painted once
+// for each look and kept. Drawn straight onto the screen instead, its
+// gradient's paint() would cover the whole screen, once for every craft.
+const stamps = new Map();
+
+export function stamp(key, size, dpr, paint) {
+    const k = `${key} ${size} ${dpr}`;
+    let picture = stamps.get(k);
+    if (!picture) {
+        picture = new Picture(size, size, dpr);
+        picture.paint(paint);
+        stamps.set(k, picture);
+    }
+    return picture;
+}

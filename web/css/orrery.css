@@ -884,8 +884,30 @@ canvas.scene {
     padding: 8px 16px;
 }
 
-.row.link .link-arrow {
+.row.link .link-arrow,
+.row.nav .link-arrow {
     font-size: 20px;
+}
+
+/* A row of the menu: a page of settings. */
+.row.nav {
+    cursor: pointer;
+}
+
+.row.nav:active,
+.row.link:active {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.settings-body.enter {
+    animation: settings-enter 0.18s ease-out;
+}
+
+@keyframes settings-enter {
+    from {
+        opacity: 0;
+        transform: translateX(14px);
+    }
 }
 
 .switch {
