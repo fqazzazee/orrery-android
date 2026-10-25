@@ -29,9 +29,12 @@ export class FolderMusic {
 
     setVolume(v) {
         this._volume = Math.max(0, Math.min(1, v));
-        if (Host.onAndroid)
-            this._tell();
-        else
+        // Android's player is shared by the app, the wallpaper and the
+        // screensaver: only the page playing it speaks for it.
+        if (Host.onAndroid) {
+            if (this._wanted)
+                this._tell();
+        } else
             this._fadeTo(this._wanted ? this._volume : 0, 0.3);
     }
 

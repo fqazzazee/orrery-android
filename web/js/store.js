@@ -79,7 +79,7 @@ const BASE = {
 
 // What the wallpaper, the lock screen and the screensaver set for
 // themselves. Each has its own default, so a quiet lock screen does not
-// need the app to be quiet too.
+// need the app to be quiet too (but see SAME and BOTH).
 const OWN = {
     'mode': {wallpaper: 'replay', lock: 'live', dream: 'replay'},
     'days-per-second': {wallpaper: 8, lock: 4, dream: 12},
@@ -94,11 +94,19 @@ const OWN = {
     'tour-idle-minutes': {wallpaper: 0, lock: 0, dream: 0},
     'zoom': {wallpaper: 100, lock: 100, dream: 100},
     'brightness': {wallpaper: 80, lock: 70, dream: 85},
-    'fps': {wallpaper: 24, lock: 20, dream: 30},
+    'fps': {wallpaper: 0, lock: 0, dream: 0},
     'idle-dim-minutes': {wallpaper: 0, lock: 0, dream: 10},
     'card-position': {wallpaper: 'auto', lock: 'auto', dream: 'auto'},
     'card-side': {wallpaper: 'right', lock: 'right', dream: 'right'},
 };
+
+// A surface's own value that means "the same as the app": the frame rate
+// follows the app's unless a surface picks its own.
+const SAME = {'fps': 0};
+
+// What is shown: off in the app is off everywhere, and each surface can
+// turn it off for itself as well.
+const BOTH = ['show-facts', 'show-hud', 'show-labels', 'show-missions'];
 
 // Only some surfaces have these.
 const ONLY = {
@@ -109,8 +117,9 @@ const ONLY = {
 
 export const SCHEMA = {...BASE};
 for (const [key, by] of Object.entries(OWN)) {
+    const rule = key in SAME ? {...BASE[key][1], same: SAME[key]} : BASE[key][1];
     for (const [surface, def] of Object.entries(by))
-        SCHEMA[`${surface}/${key}`] = [def, BASE[key][1]];
+        SCHEMA[`${surface}/${key}`] = [def, rule];
 }
 for (const [key, [def, surfaces]] of Object.entries(ONLY)) {
     for (const surface of surfaces)
@@ -130,7 +139,7 @@ function valid(key, value) {
     if (Array.isArray(rule))
         return rule.includes(value);
     if (rule && typeof value === 'number')
-        return value >= rule.min && value <= rule.max;
+        return value === rule.same || value >= rule.min && value <= rule.max;
     return true;
 }
 
@@ -172,8 +181,17 @@ export class Store {
     }
 
     get(key) {
-        return this.getRaw(this.resolve(key));
+        const full = this.resolve(key);
+        const value = this.getRaw(full);
+        if (full === key)
+            return value;
+        if (key in SAME && value === SAME[key])
+            return this.getRaw(key);
+        if (BOTH.includes(key))
+            return value && this.getRaw(key);
+        return value;
     }
+
 
     set(key, value) {
         this.setRaw(this.resolve(key), value);
@@ -220,8 +238,9 @@ export class Store {
     _changed(full) {
         const slash = full.indexOf('/');
         const key = slash < 0 ? full : full.slice(slash + 1);
-        // Only the version this surface reads matters to it.
-        if (this.resolve(key) === full)
+        // Only the version this surface reads matters to it, and the app's
+        // where this surface's follows it.
+        if (this.resolve(key) === full || full === key && (key in SAME || BOTH.includes(key)))
             this._emit(key);
         this._emitRaw?.(full);
     }

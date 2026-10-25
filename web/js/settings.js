@@ -21,17 +21,20 @@ const SUNLIGHT_AUTO_SUB = 'Turns the sunlight view on when the charger is plugge
 // Frame rates to pick from: 90 and 120 for screens that refresh that fast.
 const RATES = [10, 15, 20, 24, 30, 45, 60, 90, 120];
 
+// What is shown: off above is off everywhere (store.js, BOTH).
+const ALSO_ABOVE = 'Off above turns it off here too';
+
 // What each of the wallpaper, the lock screen and the screensaver sets for
 // itself, in the order shown.
 const OWN_ROWS = prefix => [
     ['choice', 'Clock', `${prefix}/mode`, MODE, 'Replay runs the space age forward and loops; Live shows the solar system right now'],
     ['number', 'Replay speed', `${prefix}/days-per-second`, 'Days per second', 0.5],
-    ['switch', 'Fact cards', `${prefix}/show-facts`],
+    ['switch', 'Fact cards', `${prefix}/show-facts`, ALSO_ABOVE, s => s.getRaw('show-facts')],
     ['choice', 'Card position', `${prefix}/card-position`, CARD_POSITION, CARD_POSITION_SUB],
     ['choice', 'Card side', `${prefix}/card-side`, CARD_SIDE, CARD_SIDE_SUB],
-    ['switch', 'Date and mission list', `${prefix}/show-hud`],
-    ['switch', 'Names', `${prefix}/show-labels`],
-    ['switch', 'Spacecraft', `${prefix}/show-missions`],
+    ['switch', 'Date and mission list', `${prefix}/show-hud`, ALSO_ABOVE, s => s.getRaw('show-hud')],
+    ['switch', 'Names', `${prefix}/show-labels`, ALSO_ABOVE, s => s.getRaw('show-labels')],
+    ['switch', 'Spacecraft', `${prefix}/show-missions`, ALSO_ABOVE, s => s.getRaw('show-missions')],
     ['switch', 'Sunlight view', `${prefix}/sunlight-view`],
     ['choice', 'Sunlight view by itself', `${prefix}/sunlight-auto`, SUNLIGHT_AUTO, SUNLIGHT_AUTO_SUB],
     ['choice', 'Tour', `${prefix}/tour`, TOUR, 'Flies past the planets or tells the missions’ stories by itself'],
@@ -312,11 +315,14 @@ export class SettingsPage {
     _rate(title, key, full = key.includes('/')) {
         const rates = Host.status().refreshRates ?? [];
         const top = rates.length ? Math.max(...rates) : 0;
-        const label = n => n > 60 && top && n > top + 1 ? `${n} (this screen shows ${Math.round(top)})`
+        const label = n => n === 0 ? `Same as the app (${this._settings.getRaw('fps')})`
+            : n > 60 && top && n > top + 1 ? `${n} (this screen shows ${Math.round(top)})`
             : n === 90 || n === 120 ? `${n}, smooth` : `${n}`;
         const select = h('select', {'aria-label': title});
+        // A surface's own rate can follow the app's (0).
+        const choices = full ? [0, ...RATES] : RATES;
         const fill = v => {
-            const list = RATES.includes(v) ? RATES : [...RATES, v].sort((a, b) => a - b);
+            const list = choices.includes(v) ? choices : [...choices, v].sort((a, b) => a - b);
             select.replaceChildren(...list.map(n => h('option', {value: String(n)}, label(n))));
             select.value = String(v);
         };
@@ -361,7 +367,7 @@ export class SettingsPage {
 
     _rowFrom([kind, title, key, ...rest]) {
         if (kind === 'switch')
-            return this._switch(title, key, '', null, true);
+            return this._switch(title, key, rest[0] ?? '', rest[1] ?? null, true);
         if (kind === 'choice')
             return this._choice(title, key, rest[0], rest[1] ?? '', null, true);
         if (kind === 'rate')
