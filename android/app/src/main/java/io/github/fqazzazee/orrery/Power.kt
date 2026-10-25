@@ -32,6 +32,14 @@ object Power {
         receiver = object : BroadcastReceiver() {
             override fun onReceive(c: Context, intent: Intent) {
                 val now = latest(app) ?: return
+                // Just plugged in or out, the battery's sticky state can still say the
+                // opposite: the broadcast itself is right.
+                val plugged = when (intent.action) {
+                    Intent.ACTION_POWER_CONNECTED -> true
+                    Intent.ACTION_POWER_DISCONNECTED -> false
+                    else -> now.getBoolean("charging")
+                }
+                now.put("charging", plugged).put("onBattery", !plugged)
                 for (p in watchers.toList()) p.send("power", now)
             }
         }

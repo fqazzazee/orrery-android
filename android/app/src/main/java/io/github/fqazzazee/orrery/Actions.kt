@@ -11,7 +11,7 @@ import android.util.Log
 
 // What every page may ask for: to be the wallpaper or the screensaver.
 object Actions {
-    fun call(context: Context, action: String): String = when (action) {
+    fun call(context: Context, action: String, arg: String = ""): String = when (action) {
         // Android lets an app ask for its live wallpaper, but the person picks where it goes:
         // the home screen, the lock screen or both.
         "wallpaper", "lockscreen" -> start(context,
@@ -20,6 +20,8 @@ object Actions {
                 ComponentName(context, OrreryWallpaper::class.java)),
             Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER))
         "screensaver" -> start(context, Intent(Settings.ACTION_DREAM_SETTINGS), Intent(Settings.ACTION_DISPLAY_SETTINGS))
+        "music" -> FolderMusic.call(context, arg)
+        "musicStatus" -> FolderMusic.status().toString()
         else -> "no"
     }
 

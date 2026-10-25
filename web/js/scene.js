@@ -48,7 +48,7 @@ const NAME_RANK = ['earth', 'jupiter', 'saturn', 'uranus', 'neptune', 'mars', 'v
 // Changing these lays the scene out again.
 const RELAYOUT_KEYS = ['distance-scale', 'tilt', 'portrait-tilt', 'azimuth', 'zoom', 'planet-scale', 'show-orbits',
     'show-stars', 'show-belts', 'show-pluto', 'show-labels', 'show-hud', 'show-missions', 'show-facts',
-    'timeline', 'show-moons', 'show-small-bodies', 'show-lagrange'];
+    'timeline', 'show-moons', 'show-small-bodies', 'show-lagrange', 'card-position', 'card-side'];
 
 const smooth = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
 const easeInOutCubic = x => x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
@@ -541,8 +541,11 @@ export class Scene {
         const availH = sceneBottom - sceneTop;
         // A phone on its side has no room to spare: the planets keep left
         // of the cards.
-        const sceneRight = this.short ? right - this._cardWidth - 2 * this._margin : right;
-        const availW = sceneRight - left;
+        const column = this._cardWidth + 2 * this._margin;
+        const leftSide = this._settings.get('card-side') === 'left';
+        const sceneLeft = this.short && leftSide ? left + column : left;
+        const sceneRight = this.short && !leftSide ? right - column : right;
+        const availW = sceneRight - sceneLeft;
         const fitPx = Math.min(availW * (this.narrow ? 0.48 : 0.46), availH * 0.46 / Math.max(0.2, Math.cos(tilt * Math.PI / 180))) * zoom;
         // Automatic: logarithmic on a phone (either way up), where the inner planets would
         // otherwise huddle around the Sun.
@@ -550,7 +553,7 @@ export class Scene {
         if (mode === 'auto')
             mode = this.narrow || this.short ? 'log' : 'sqrt';
         this._projParams = {
-            cx: (left + sceneRight) / 2, cy: sceneTop + availH / 2, fitPx,
+            cx: (sceneLeft + sceneRight) / 2, cy: sceneTop + availH / 2, fitPx,
             mode, tilt, azimuth: s.get('azimuth'),
         };
         this._farReach = new Astro.Projection({...this._projParams, zoomOut: FAR_FROM}).reach;
@@ -1250,6 +1253,10 @@ export class Scene {
         const m = narrow ? 12 : Math.round(Math.max(14, W * 0.018));
         this._margin = m;
         this._hud.classList.toggle('narrow', narrow);
+        // Cards on the left of a wide screen: the date and the missions go
+        // to the right.
+        this._hudRight = !narrow && s.get('card-side') === 'left';
+        this._hud.classList.toggle('hud-right', this._hudRight);
         this._dateBox.hidden = !show;
         this._cardWidth = narrow ? Math.min(520, right - left - 2 * m) : Math.round(Math.min(380, Math.max(280, W * 0.28)));
 
@@ -1276,12 +1283,16 @@ export class Scene {
         const dateH = show ? (this._dateBox.offsetHeight || 60) : 0;
         const topY = top + Math.round(m * 0.6);
         this._dateTop = topY;
-        this._dateBox.style.transform = `translate(${left + m}px, ${topY}px)`;
+        this._hudPlace(this._dateBox, 0, topY);
         this._topY = show && narrow ? topY + dateH + 6 : topY;
         // Where the planets may go: below the date on a phone, above the
         // timeline; craft names and edge arrows keep inside it too.
-        const sceneTop = narrow && show ? topY + dateH + 10 : top;
-        const sceneBottom = on ? (narrow && this.portrait ? ty - 10 - Math.min(150, H * 0.16) : ty - 4) : bottom;
+        // A phone held upright keeps room for the cards, below the planets
+        // or above them.
+        const pos = this._cardPosition();
+        const room = narrow && this.portrait ? Math.min(150, H * 0.16) : 0;
+        const sceneTop = (narrow && show ? topY + dateH + 10 : top) + (pos === 'top' ? room : 0);
+        const sceneBottom = (on ? (narrow && this.portrait ? ty - 10 : ty - 4) : bottom) - (pos === 'bottom' ? room : 0);
         this._slots = {
             cardTop: narrow ? null : top + m,
             cardBottom: (on ? ty - gap : bottom - m),
@@ -1460,8 +1471,8 @@ export class Scene {
         this._legend.hidden = !legendOn;
         if (legendOn) {
             const dh = this._dateBox.hidden ? 0 : this._dateBox.offsetHeight;
-            const {left, top} = this._area;
-            this._legend.style.transform = `translate(${left + this._margin}px, ${top + Math.round(this._margin * 0.6) + dh + 10}px)`;
+            const {top} = this._area;
+            this._hudPlace(this._legend, 0, top + Math.round(this._margin * 0.6) + dh + 10);
         }
         this._updateMissionList();
     }
@@ -1526,19 +1537,21 @@ export class Scene {
         } else {
             this._moreLabel.remove();
         }
-        const {left} = this._area;
         if (narrow) {
             const legendTop = this._slots.listTop + legendH;
-            this._missionBox.style.transform = `translate(${left + this._margin - 6}px, ${legendTop}px)`;
+            this._hudPlace(this._missionBox, -6, legendTop);
             const y = this._barY();
             if (y !== this._lastBarY) {
                 this._lastBarY = y;
                 this._placeBackButton();
                 this._placeStoryBar();
+                // Cards at the top sit under the missions.
+                if (this._cardPosition() === 'top')
+                    this._stackEventCards();
             }
         } else {
             const hh = this._missionBox.offsetHeight;
-            this._missionBox.style.transform = `translate(${left + this._margin - 6}px, ${this._slots.listBottom - hh}px)`;
+            this._hudPlace(this._missionBox, -6, this._slots.listBottom - hh);
         }
     }
 
@@ -1988,46 +2001,145 @@ export class Scene {
             this._pulse(tr);
     }
 
-    // Event cards stack up from the bottom right; on a phone, above the
-    // fact card or the pinned one.
+    // Where the cards go, as the settings say. Auto: at the bottom on a
+    // phone; on a wide screen the fact card at the top and the news at the
+    // bottom.
+    _cardPosition() {
+        return this._settings.get('card-position');
+    }
+
+    // The column the cards keep to: clear of the date and the missions
+    // above, and of the timeline below.
+    _cardColumn() {
+        const {top} = this._area;
+        const m = this._margin;
+        if (this.narrow) {
+            let colTop = this._slots.sceneTop - (this._cardPosition() === 'top' ? Math.min(150, this._H * 0.16) : 0);
+            if (!this._missionBox.hidden)
+                colTop = Math.max(colTop, this._barY() + 2);
+            for (const bar of [this._backButton, this._storyBar?.el]) {
+                if (bar && !bar.hidden && bar.offsetHeight)
+                    colTop = Math.max(colTop, this._barY() + bar.offsetHeight + 8);
+            }
+            return [colTop, this._slots.cardBottom];
+        }
+        // On the left the date and the missions have moved out of the way.
+        return [top + m, this._slots.eventBottom];
+    }
+
+    // Lays out the cards: the pinned card (or the fact card) and the event
+    // cards, newest nearest it. Cards that no longer fit give way.
     _stackEventCards() {
         if (!this._slots)
             return;
-        let y = this._slots.eventBottom;
-        // Clear of the fact card or the pinned one: below them on a tablet,
-        // above them on a phone. Cards that no longer fit give way.
-        const other = this._pin ?? this._factCard;
-        const shown = other && !other.dismissed;
-        let floor = this.narrow ? this._slots.sceneTop : this._slots.cardTop;
-        if (shown && this.narrow)
-            y = other.y - 10;
-        else if (shown)
-            floor = other.y + other.height + 10;
-        const x = this.narrow ? this._cardX() : this._area.right - this._margin - this._cardWidth;
-        for (const [i, c] of [...this._eventCards].entries()) {
-            y -= c.card.height;
-            if (i > 0 && y < floor) {
-                this._eventCards.splice(this._eventCards.indexOf(c), 1);
-                c.card.dismiss();
+        const [colTop, colBottom] = this._cardColumn();
+        const x = this._cardX();
+        const gap = 10;
+        let pos = this._cardPosition();
+        const main = [this._pin, this._factCard].find(c => c && !c.dismissed) ?? null;
+        if (main && main === this._pin) {
+            const maxH = Math.round((colBottom - colTop) * (this.narrow ? 0.62 : 1));
+            if (main._maxHeight !== maxH)
+                main.setMaxHeight(maxH);
+        }
+        // Auto on a wide screen: the main card at the top, the news stacked
+        // up from the bottom.
+        if (pos === 'auto' && !this.narrow) {
+            let y = colBottom, floor = colTop;
+            if (main) {
+                main.place(x, colTop);
+                floor = colTop + main.height + gap;
+            }
+            this._eachEventCard((c, first) => {
+                y -= c.card.height;
+                if (!first && y < floor)
+                    return false;
+                c.card.place(x, y);
+                y -= gap;
+                return true;
+            });
+            return;
+        }
+        if (pos === 'auto')
+            pos = 'bottom';
+        // Otherwise one stack: from the bottom, the main card lowest; from
+        // the top or the middle, the main card first.
+        const room = colBottom - colTop;
+        const cards = [];
+        let total = main ? main.height : -gap;
+        for (const c of this._eventCards) {
+            if (cards.length && total + gap + c.card.height > room) {
+                cards.push([c, false]);
                 continue;
             }
-            c.card.place(x, y);
-            y -= 10;
+            total += gap + c.card.height;
+            cards.push([c, true]);
+        }
+        let y;
+        if (pos === 'bottom') {
+            y = colBottom;
+            if (main) {
+                y -= main.height;
+                main.place(x, y);
+                y -= gap;
+            }
+            for (const [c, fits] of cards) {
+                if (!fits)
+                    continue;
+                y -= c.card.height;
+                c.card.place(x, y);
+                y -= gap;
+            }
+        } else {
+            y = pos === 'top' ? colTop : Math.max(colTop, Math.round(colTop + (room - total) / 2));
+            if (main) {
+                main.place(x, y);
+                y += main.height + gap;
+            }
+            for (const [c, fits] of cards) {
+                if (!fits)
+                    continue;
+                c.card.place(x, y);
+                y += c.card.height + gap;
+            }
+        }
+        this._eachEventCard((c, first) => first || cards.find(([d]) => d === c)?.[1] !== false);
+    }
+
+    // Keeps the event cards for which keep(card, first) is true.
+    _eachEventCard(keep) {
+        for (const [i, c] of [...this._eventCards].entries()) {
+            if (keep(c, i === 0))
+                continue;
+            this._eventCards.splice(this._eventCards.indexOf(c), 1);
+            c.card.dismiss();
         }
     }
 
     _cardX() {
         const {left, right} = this._area;
-        return this.narrow ? Math.round((left + right - this._cardWidth) / 2) : right - this._margin - this._cardWidth;
+        if (this.narrow)
+            return Math.round((left + right - this._cardWidth) / 2);
+        return this._settings.get('card-side') === 'left' ? left + this._margin : right - this._margin - this._cardWidth;
     }
 
-    // The rotating fact card: top right on a tablet, above the timeline on
-    // a phone.
-    _placeFactCard(card) {
-        if (this.narrow)
-            card.place(this._cardX(), this._slots.cardBottom - card.height);
-        else
-            card.place(this._cardX(), this._slots.cardTop);
+    // The rotating fact card goes where the stack puts it.
+    _placeFactCard(_card) {
+        this._stackEventCards();
+    }
+
+    // The date, the legend and the missions: from the left edge, or from
+    // the right one while the cards take the left.
+    _hudPlace(el, dx, y) {
+        if (this._hudRight) {
+            el.style.left = 'auto';
+            el.style.right = `${Math.round(this._W - this._area.right + this._margin + dx)}px`;
+            el.style.transform = `translateY(${Math.round(y)}px)`;
+        } else {
+            el.style.left = '';
+            el.style.right = '';
+            el.style.transform = `translate(${Math.round(this._area.left + this._margin + dx)}px, ${Math.round(y)}px)`;
+        }
     }
 
     // A brief ring that swells around a craft at a gravity assist.
@@ -2234,21 +2346,8 @@ export class Scene {
 
     // Top right on a tablet; on a phone, up from the timeline.
     _placePin() {
-        const pin = this._pin;
-        if (!pin)
-            return;
-        if (this.narrow) {
-            const maxH = Math.round((this._slots.cardBottom - this._area.top) * 0.62);
-            if (pin._maxHeight !== maxH)
-                pin.setMaxHeight(maxH);
-            pin.place(this._cardX(), this._slots.cardBottom - pin.height);
-        } else {
-            const maxH = this._slots.cardBottom - this._slots.cardTop;
-            if (pin._maxHeight !== maxH)
-                pin.setMaxHeight(maxH);
-            pin.place(this._cardX(), this._slots.cardTop);
-        }
-        this._stackEventCards();
+        if (this._pin)
+            this._stackEventCards();
     }
 
     _deselect() {

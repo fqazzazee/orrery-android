@@ -12,6 +12,14 @@ const STORY_MISSIONS = MISSIONS.filter(m => m.group !== 'observatory')
 
 const MODE = [['replay', 'Replay history'], ['live', 'Live']];
 const TOUR = [['off', 'Off'], ['planets', 'Planet flybys'], ['stories', 'Every story'], ['mission', 'One story']];
+const CARD_POSITION = [['auto', 'Auto'], ['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']];
+const CARD_SIDE = [['left', 'Left'], ['right', 'Right']];
+const CARD_POSITION_SUB = 'Auto: at the bottom of a phone; on a tablet the fact card at the top and mission news at the bottom';
+const CARD_SIDE_SUB = 'On a tablet or a phone on its side. Cards on the left move the date and the missions to the right';
+const SUNLIGHT_AUTO = [['manual', 'Never'], ['charging', 'While charging'], ['battery', 'On battery']];
+const SUNLIGHT_AUTO_SUB = 'Turns the sunlight view on when the charger is plugged in (or out), and off again after; the ☀ button still works in between';
+// Frame rates to pick from: 90 and 120 for screens that refresh that fast.
+const RATES = [10, 15, 20, 24, 30, 45, 60, 90, 120];
 
 // What each of the wallpaper, the lock screen and the screensaver sets for
 // itself, in the order shown.
@@ -19,21 +27,26 @@ const OWN_ROWS = prefix => [
     ['choice', 'Clock', `${prefix}/mode`, MODE, 'Replay runs the space age forward and loops; Live shows the solar system right now'],
     ['number', 'Replay speed', `${prefix}/days-per-second`, 'Days per second', 0.5],
     ['switch', 'Fact cards', `${prefix}/show-facts`],
+    ['choice', 'Card position', `${prefix}/card-position`, CARD_POSITION, CARD_POSITION_SUB],
+    ['choice', 'Card side', `${prefix}/card-side`, CARD_SIDE, CARD_SIDE_SUB],
     ['switch', 'Date and mission list', `${prefix}/show-hud`],
     ['switch', 'Names', `${prefix}/show-labels`],
     ['switch', 'Spacecraft', `${prefix}/show-missions`],
     ['switch', 'Sunlight view', `${prefix}/sunlight-view`],
+    ['choice', 'Sunlight view by itself', `${prefix}/sunlight-auto`, SUNLIGHT_AUTO, SUNLIGHT_AUTO_SUB],
     ['choice', 'Tour', `${prefix}/tour`, TOUR, 'Flies past the planets or tells the missions’ stories by itself'],
     ['select', 'Story', `${prefix}/tour-mission`, STORY_MISSIONS, '', s => s.getRaw(`${prefix}/tour`) === 'mission'],
     ['number', 'Zoom', `${prefix}/zoom`, 'Percent; 100 fits Neptune’s orbit', 5],
     ['number', 'Brightness', `${prefix}/brightness`, 'Percent; lower spares OLED pixels', 5],
-    ['number', 'Frames per second', `${prefix}/fps`, '', 1],
+    ['rate', 'Frames per second', `${prefix}/fps`],
 ];
 
 export class SettingsPage {
-    constructor(parent, settings, {onClose}) {
+    constructor(parent, settings, {onClose, onPickFolder = null, musicStatus = null}) {
         this._settings = settings;
         this._onClose = onClose;
+        this._onPickFolder = onPickFolder;
+        this._musicStatus = musicStatus;
         this._rows = [];
         this.el = h('div', {class: 'settings', hidden: true});
         for (const type of ['pointerdown', 'pointerup', 'click', 'wheel'])
@@ -156,6 +169,8 @@ export class SettingsPage {
         body.append(this._group('Text', 'text', [
             this._switch('Fact cards', 'show-facts', 'Distances, speeds and trivia, plus a card at each mission event'),
             this._number('Each fact stays up for', 'fact-interval', 'Seconds', 1, s => s.get('show-facts')),
+            this._choice('Card position', 'card-position', CARD_POSITION, CARD_POSITION_SUB),
+            this._choice('Card side', 'card-side', CARD_SIDE, CARD_SIDE_SUB),
             this._switch('Date and mission list', 'show-hud'),
             this._choice('Timeline', 'timeline', [['auto', 'After a touch'], ['always', 'Always']], 'Scrub through time, change speed and jump to mission events'),
         ]));
@@ -164,16 +179,18 @@ export class SettingsPage {
             this._switch('Trails', 'show-trails'),
             this._number('Trail length', 'trail-years', 'Years of path kept on screen', 0.5, s => s.get('show-trails')),
             this._switch('Sunlight view', 'sunlight-view', 'Color the plane of the planets by how much sunlight falls there, from 9,000 W/m² at Mercury to 1.5 at Neptune'),
-            this._choice('Sunlight view by itself', 'sunlight-auto', [['manual', 'Never'], ['charging', 'While charging'], ['battery', 'On battery']],
-                'Switches when the charger is plugged in or out; the ☀ button still works in between'),
+            this._choice('Sunlight view by itself', 'sunlight-auto', SUNLIGHT_AUTO, SUNLIGHT_AUTO_SUB),
         ]));
         body.append(this._group('Music', 'music', [
             this._choice('Play', 'music-mode', [['muted', 'Muted'], ['background', 'While Orrery is open']],
-                'A slow ambient piece made up as it plays: drifting chords, a low drone and soft bells in long echoes'),
+                'The screensaver has its own switch, under Screensaver'),
+            this._choice('Music', 'music-source', [['ambient', 'Made up as it plays'], ['folder', 'My own music']],
+                'The built-in piece: drifting chords, a low drone and soft bells in long echoes, never quite the same twice. Or the tracks in a folder of yours, shuffled'),
+            this._folderRow(),
             this._number('Volume', 'music-volume', 'Percent', 5),
         ]));
         body.append(this._group('Power and OLED care', 'power', [
-            this._number('Frames per second', 'fps', '', 5),
+            this._rate('Frames per second', 'fps'),
             this._switch('Slow down when still', 'adaptive-fps', 'Drop to 5 frames per second while time is paused, the planets are not spinning and nobody is touching it'),
             this._switch('Battery saver', 'battery-saver', 'On battery saver mode (or on battery, in a browser), lower the frame rate and stop the planets spinning'),
             this._number('Frames per second when saving', 'battery-fps', '', 5, s => s.get('battery-saver')),
@@ -290,6 +307,47 @@ export class SettingsPage {
         return row;
     }
 
+    // A frame rate, from RATES (and whatever was set before, if not one of
+    // them). Rates past what the screen can show are marked.
+    _rate(title, key, full = key.includes('/')) {
+        const rates = Host.status().refreshRates ?? [];
+        const top = rates.length ? Math.max(...rates) : 0;
+        const label = n => n > 60 && top && n > top + 1 ? `${n} (this screen shows ${Math.round(top)})`
+            : n === 90 || n === 120 ? `${n}, smooth` : `${n}`;
+        const select = h('select', {'aria-label': title});
+        const fill = v => {
+            const list = RATES.includes(v) ? RATES : [...RATES, v].sort((a, b) => a - b);
+            select.replaceChildren(...list.map(n => h('option', {value: String(n)}, label(n))));
+            select.value = String(v);
+        };
+        select.addEventListener('change', () => this._set(key, +select.value, full));
+        const sub = top ? `This screen refreshes up to ${Math.round(top)} times a second; more is smoother and uses more battery`
+            : 'More is smoother and uses more battery; 90 and 120 need a screen that fast';
+        const row = h('label', {class: 'row'}, this._text(title, sub), select);
+        this._rows.push({row, enabled: null, sync: () => fill(this._get(key, full))});
+        return row;
+    }
+
+    // The music folder: its name, how many tracks it has, and a button to
+    // choose another.
+    _folderRow() {
+        const sub = h('div', {class: 'row-sub'});
+        const row = h('div', {class: 'row'},
+            h('div', {class: 'row-text'}, h('div', {class: 'row-title'}, 'Folder'), sub),
+            h('button', {class: 'pill action', onclick: () => this._onPickFolder?.()}, 'Choose'));
+        this._rows.push({row, enabled: null, sync: () => {
+            const name = this._settings.get('music-folder-name');
+            if (!this._settings.get('music-folder')) {
+                sub.textContent = 'None chosen. Music files in it and its subfolders play, shuffled';
+                return;
+            }
+            const status = this._musicStatus?.() ?? {};
+            const count = status.tracks > 0 ? ` · ${status.tracks} track${status.tracks === 1 ? '' : 's'}` : '';
+            sub.textContent = status.error ? `${name}: ${status.error}` : `${name || 'Chosen'}${count}`;
+        }});
+        return row;
+    }
+
     _button(title, sub, label, onClick) {
         return h('div', {class: 'row'}, this._text(title, sub), h('button', {class: 'pill action', onclick: onClick}, label));
     }
@@ -306,6 +364,8 @@ export class SettingsPage {
             return this._switch(title, key, '', null, true);
         if (kind === 'choice')
             return this._choice(title, key, rest[0], rest[1] ?? '', null, true);
+        if (kind === 'rate')
+            return this._rate(title, key, true);
         if (kind === 'select')
             return this._select(title, key, rest[0], rest[1] ?? '', rest[2] ?? null, true);
         return this._number(title, key, rest[0] ?? '', rest[1] ?? 1, null, true);

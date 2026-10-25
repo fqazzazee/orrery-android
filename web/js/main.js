@@ -9,6 +9,7 @@ import {Music} from './music.js';
 import {Scene} from './scene.js';
 import {SettingsPage} from './settings.js';
 import {Store} from './store.js';
+import {FolderMusic} from './tracks.js';
 
 const IDLE_FPS = 10;
 const STILL_FPS = 5;
@@ -22,6 +23,7 @@ document.body.dataset.surface = surface;
 const app = surface === 'app';
 
 const music = new Music();
+const tracks = new FolderMusic();
 let power = {onBattery: false, saver: false, charging: true, known: false};
 let visible = !document.hidden;
 let hostVisible = true;
@@ -36,10 +38,14 @@ scene.onActivity = () => wake();
 
 let settingsPage = null;
 function openSettings(section = null) {
-    settingsPage ??= new SettingsPage(document.body, store, {onClose: () => {
-        scene.relayout();
-        syncRunning();
-    }});
+    settingsPage ??= new SettingsPage(document.body, store, {
+        onClose: () => {
+            scene.relayout();
+            syncRunning();
+        },
+        onPickFolder: pickFolder,
+        musicStatus: () => tracks.status(),
+    });
     settingsPage.open(section);
     syncRunning();
 }
@@ -95,10 +101,13 @@ function frame(now) {
         return;
     frameId = requestAnimationFrame(frame);
     // A frame when the rate allows: requestAnimationFrame comes at the
-    // screen's rate, 60 or 120 a second.
-    if (now - lastFrame < 1000 / fps() - 4)
+    // screen's rate, 60, 90 or 120 a second. The time over the interval is
+    // carried, so 90 on a 120 screen draws three frames in four, not all.
+    const interval = 1000 / fps();
+    const since = now - lastFrame;
+    if (since < interval - 1.5)
         return;
-    lastFrame = now;
+    lastFrame = since > 2 * interval ? now : now - Math.max(0, since - interval);
     const dt = Math.min(0.25, (now - last) / 1000);
     last = now;
     try {
@@ -160,6 +169,7 @@ function wake() {
         scene.setDim(1);
     }
     music.unlock();
+    tracks.unlock();
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -170,27 +180,64 @@ window.addEventListener('pagehide', () => scene.saveTime());
 
 // ---- Music ----
 
+// While Orrery is on screen, the settings too: a change of volume or of
+// folder is heard as it is made.
 function wantMusic() {
-    if (!running())
+    if (!visible || !hostVisible)
         return false;
     if (store.surface === 'dream')
         return store.get('music');
     return app && store.get('music-mode') !== 'muted';
 }
 
+// The ambient piece or your own tracks, never both.
 function syncMusic() {
-    music.setVolume(store.get('music-volume') / 100);
-    if (wantMusic())
+    const volume = store.get('music-volume') / 100;
+    const folder = store.get('music-source') === 'folder' && store.get('music-folder');
+    const want = wantMusic();
+    music.setVolume(volume);
+    tracks.setVolume(volume);
+    if (want && folder)
+        tracks.play(folder);
+    else
+        tracks.pause();
+    if (want && !folder)
         music.play();
     else
         music.pause();
     scene.setMusicState(app ? store.get('music-mode') : 'hidden');
 }
 
+// Choosing the music folder: Android's folder picker, which tells every
+// page through the settings once a folder is chosen; in a browser, a folder
+// of files for this visit.
+function pickFolder() {
+    if (Host.onAndroid) {
+        Host.call('pickMusicFolder');
+        return;
+    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.webkitdirectory = true;
+    input.addEventListener('change', () => {
+        const files = [...input.files];
+        if (!files.length)
+            return;
+        const name = files[0].webkitRelativePath?.split('/')[0] || 'Chosen files';
+        tracks.useFiles(files);
+        store.set('music-folder-name', name);
+        store.set('music-folder', `browser:${name}`);
+        store.set('music-source', 'folder');
+        settingsPage?.refresh();
+    });
+    input.click();
+}
+
 // ---- Settings that reach past the scene ----
 
 store.connect(key => {
-    if (key === 'music-mode' || key === 'music-volume' || key === 'music')
+    if (key.startsWith('music'))
         syncMusic();
     else if (key === 'keep-screen-on' || key === 'immersive')
         syncWindow();
@@ -198,7 +245,21 @@ store.connect(key => {
         syncSunlightAuto(true);
     else if (key === 'battery-saver')
         scene.powerSaving = saving();
+    if (key === 'fps' || key === 'battery-fps' || key === 'battery-saver')
+        syncRefresh();
 });
+
+// The screen's refresh rate to ask Android for: the slowest that keeps up
+// with the frame rate, so 60 does not run a 120 Hz screen flat out, and 90
+// or 120 get a screen that fast.
+let askedRate = 0;
+function syncRefresh() {
+    const rate = saving() ? Math.min(store.get('fps'), store.get('battery-fps')) : store.get('fps');
+    if (rate === askedRate)
+        return;
+    askedRate = rate;
+    Host.call('refreshRate', rate);
+}
 
 function syncWindow() {
     if (app) {
@@ -226,6 +287,7 @@ function setPower(p) {
     power = {...power, ...p, known: true};
     scene.powerSaving = saving();
     syncSunlightAuto();
+    syncRefresh();
 }
 Host.watchPower(setPower);
 
@@ -351,7 +413,7 @@ window.orrery = {
     },
     back,
     // For the tests and the screenshots: the scene, the store, the clock.
-    scene, store, Astro,
+    scene, store, Astro, tracks,
 };
 
 function handleHost(type, data) {
@@ -367,6 +429,9 @@ function handleHost(type, data) {
             scene.setInsets(effectiveInsets());
             if (data !== 'lock')
                 scene._deselect();
+            syncRefresh();
+            // The lock screen has its own sunlight view and its own rule for it.
+            syncSunlightAuto(true);
         }
         return true;
     case 'visible':
@@ -397,6 +462,11 @@ function handleHost(type, data) {
     case 'settings':
         openSettings(data || null);
         return true;
+    case 'music':
+        // The folder has been read, or a track would not play: the
+        // settings say how many tracks there are, or what went wrong.
+        settingsPage?.refresh();
+        return true;
     }
     return false;
 }
@@ -404,6 +474,7 @@ function handleHost(type, data) {
 // ---- Off we go ----
 
 syncWindow();
+syncRefresh();
 syncMusic();
 start();
 Host.ready();

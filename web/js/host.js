@@ -50,6 +50,19 @@ export function call(action, arg = '') {
     }
 }
 
+// Ask the host something: its answer, or null if it cannot say.
+export function ask(action, arg = '') {
+    if (!bridge)
+        return null;
+    try {
+        const answer = bridge.call(action, String(arg));
+        return answer === 'no' ? null : answer;
+    } catch (e) {
+        console.warn(`Orrery: ${action}: ${e.message}`);
+        return null;
+    }
+}
+
 // What the host knows: whether Orrery is the wallpaper, the lock screen,
 // the screensaver; the app's version.
 export function status() {

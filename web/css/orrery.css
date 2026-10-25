@@ -967,3 +967,20 @@ input[type=range] {
 body:not([data-surface="app"]) .card-btn {
     display: none;
 }
+
+/* Cards on the left of a wide screen: the date and the missions on the
+   right. */
+.hud-right .datebox,
+.hud-right .legend {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.hud-right .missions {
+    align-items: flex-end;
+}
+
+.hud-right .mission-more {
+    padding-left: 0;
+    padding-right: 6px;
+}

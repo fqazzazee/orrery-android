@@ -5,9 +5,9 @@ package io.github.fqazzazee.orrery
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -24,9 +24,11 @@ class MainActivity : Activity(), PageHost {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
-        if (Build.VERSION.SDK_INT >= 30) {
+        // Edge to edge, the bars transparent (the theme's): Android 15 and later always are.
+        if (Build.VERSION.SDK_INT >= 35) {
+            // Nothing to do.
+        } else if (Build.VERSION.SDK_INT >= 30) {
+            @Suppress("DEPRECATION")
             window.setDecorFitsSystemWindows(false)
         } else {
             @Suppress("DEPRECATION")
@@ -134,11 +136,58 @@ class MainActivity : Activity(), PageHost {
             else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             "yes"
         }
+        "refreshRate" -> Refresh.apply(window, if (Build.VERSION.SDK_INT >= 30) display else Refresh.display(this),
+            arg.toFloatOrNull() ?: 60f)
         "immersive" -> {
             immersive = arg == "true"
             applyImmersive()
             "yes"
         }
-        else -> Actions.call(this, action)
+        "pickMusicFolder" -> {
+            pickFolder()
+            "yes"
+        }
+        else -> Actions.call(this, action, arg)
+    }
+
+    // Android's folder picker: the folder chosen is kept readable across restarts, and the
+    // settings tell every page.
+    @Suppress("DEPRECATION")
+    private fun pickFolder() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).addFlags(
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        try {
+            startActivityForResult(intent, PICK_FOLDER)
+        } catch (e: Exception) {
+            Log.w(Page.TAG, "folder picker: $e")
+        }
+    }
+
+    @Deprecated("The AndroidX result API needs AndroidX Activity, which this app does without")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
+        val tree = data?.data
+        if (requestCode != PICK_FOLDER || resultCode != RESULT_OK || tree == null) return
+        try {
+            contentResolver.takePersistableUriPermission(tree, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        } catch (e: Exception) {
+            Log.w(Page.TAG, "music folder: $e")
+        }
+        // Only the folder in use stays granted.
+        for (p in contentResolver.persistedUriPermissions)
+            if (p.uri != tree) contentResolver.releasePersistableUriPermission(p.uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val name = try {
+            FolderMusic.name(this, tree)
+        } catch (_: Exception) {
+            "Music"
+        }
+        Hub.save(this, null, "music-folder-name", JSONObject.quote(name))
+        Hub.save(this, null, "music-folder", JSONObject.quote(tree.toString()))
+        Hub.save(this, null, "music-source", JSONObject.quote("folder"))
+    }
+
+    private companion object {
+        const val PICK_FOLDER = 1
     }
 }

@@ -39,5 +39,8 @@ class OrreryDream : DreamService(), PageHost {
         super.onDetachedFromWindow()
     }
 
-    override fun call(action: String, arg: String): String = Actions.call(this, action)
+    override fun call(action: String, arg: String): String = when (action) {
+        "refreshRate" -> window?.let { Refresh.apply(it, Refresh.display(this), arg.toFloatOrNull() ?: 60f) } ?: "no"
+        else -> Actions.call(this, action, arg)
+    }
 }

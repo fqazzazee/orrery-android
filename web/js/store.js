@@ -44,6 +44,10 @@ const BASE = {
     'show-lagrange': [true],
     'show-hud': [true],
     'fact-interval': [14, {min: 5, max: 120}],
+    // Where the cards go: auto puts them at the bottom of a phone, and on a
+    // wide screen the fact card top right and the news bottom right.
+    'card-position': ['auto', ['auto', 'top', 'middle', 'bottom']],
+    'card-side': ['right', ['left', 'right']],
     'trail-years': [8, {min: 0.5, max: 60}],
     'disabled-missions': [[]],
     // Interaction
@@ -53,8 +57,15 @@ const BASE = {
     // Music
     'music-mode': ['muted', ['muted', 'background']],
     'music-volume': [35, {min: 0, max: 100}],
+    // The ambient piece, or the tracks in a folder of your own, shuffled.
+    // On Android the folder is the one Android gave access to; its name is
+    // kept for the settings.
+    'music-source': ['ambient', ['ambient', 'folder']],
+    'music-folder': [''],
+    'music-folder-name': [''],
     // Power and OLED care
-    'fps': [30, {min: 10, max: 60}],
+    // Up to 120 for the screens that refresh 90 or 120 times a second.
+    'fps': [30, {min: 10, max: 120}],
     'adaptive-fps': [true],
     'battery-saver': [true],
     'battery-fps': [15, {min: 5, max: 60}],
@@ -77,6 +88,7 @@ const OWN = {
     'show-labels': {wallpaper: true, lock: true, dream: true},
     'show-missions': {wallpaper: true, lock: true, dream: true},
     'sunlight-view': {wallpaper: false, lock: false, dream: false},
+    'sunlight-auto': {wallpaper: 'manual', lock: 'manual', dream: 'manual'},
     'tour': {wallpaper: 'off', lock: 'off', dream: 'stories'},
     'tour-mission': {wallpaper: 'voyager1', lock: 'voyager1', dream: 'voyager1'},
     'tour-idle-minutes': {wallpaper: 0, lock: 0, dream: 0},
@@ -84,6 +96,8 @@ const OWN = {
     'brightness': {wallpaper: 80, lock: 70, dream: 85},
     'fps': {wallpaper: 24, lock: 20, dream: 30},
     'idle-dim-minutes': {wallpaper: 0, lock: 0, dream: 10},
+    'card-position': {wallpaper: 'auto', lock: 'auto', dream: 'auto'},
+    'card-side': {wallpaper: 'right', lock: 'right', dream: 'right'},
 };
 
 // Only some surfaces have these.

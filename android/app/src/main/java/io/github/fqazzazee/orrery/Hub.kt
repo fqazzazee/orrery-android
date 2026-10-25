@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
+import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
 
@@ -28,8 +29,9 @@ object Hub {
         return out
     }
 
-    // json "null" removes the key: back to its default.
-    fun save(context: Context, from: Page, key: String, json: String) {
+    // json "null" removes the key: back to its default. from is the page that made the change
+    // (it knows already); null tells every page.
+    fun save(context: Context, from: Page?, key: String, json: String) {
         val value = try {
             JSONTokener(json).nextValue()
         } catch (_: Exception) {
@@ -41,6 +43,11 @@ object Hub {
         val message = JSONObject().put("key", key).put("value", value)
         for (page in pages.toList())
             if (page !== from) page.send("setting", message)
+    }
+
+    // A message for every page.
+    fun tell(type: String, data: Any?) {
+        for (page in pages.toList()) page.send(type, data)
     }
 
     // Whether Orrery is the wallpaper, on the lock screen, the screensaver.
@@ -69,6 +76,8 @@ object Hub {
             .put("lock", lock)
             .put("dream", dream)
             .put("version", BuildConfig.VERSION_NAME)
+            .put("sdk", Build.VERSION.SDK_INT)
+            .put("refreshRates", JSONArray(Refresh.display(context)?.let { Refresh.rates(it) }?.map { it.toDouble() } ?: listOf<Double>()))
             .put("lockNote", "The lock screen shows the live wallpaper unless it has a picture of its own: " +
                 "to give it Orrery, set the wallpaper again and choose the lock screen too.")
     }
